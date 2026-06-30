@@ -1,7 +1,7 @@
-// components/Header.tsx - VERSIÓN COMPLETA CORREGIDA
+// components/Header.tsx
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FaBars, FaTimes } from 'react-icons/fa'
@@ -18,12 +18,12 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState('inicio')
+  const menuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50)
       
-      // Detectar sección activa
       const sections = navLinks.map(link => link.href.replace('#', ''))
       const scrollPosition = window.scrollY + 100
       
@@ -43,7 +43,6 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Cerrar menú al hacer scroll
   useEffect(() => {
     const handleScroll = () => {
       if (isMobileMenuOpen) {
@@ -54,7 +53,6 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [isMobileMenuOpen])
 
-  // Prevenir scroll del body cuando el menú está abierto
   useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = 'hidden'
@@ -66,33 +64,40 @@ export default function Header() {
     }
   }, [isMobileMenuOpen])
 
-  // ✅ Función para scroll suave al inicio
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMobileMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
   const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    })
+    window.scrollTo({ top: 0, behavior: 'smooth' })
     setIsMobileMenuOpen(false)
   }
 
-  // ✅ Función para scroll suave a cualquier sección
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault()
-    
-    if (href === '#inicio') {
-      scrollToTop()
-      return
-    }
-    
-    const target = document.querySelector(href)
-    if (target) {
-      const targetPosition = target.getBoundingClientRect().top + window.scrollY - 80
-      window.scrollTo({
-        top: targetPosition,
-        behavior: 'smooth'
-      })
-    }
     setIsMobileMenuOpen(false)
+    
+    setTimeout(() => {
+      if (href === '#inicio') {
+        scrollToTop()
+        return
+      }
+      
+      const target = document.querySelector(href)
+      if (target) {
+        const targetPosition = target.getBoundingClientRect().top + window.scrollY - 80
+        window.scrollTo({
+          top: targetPosition,
+          behavior: 'smooth'
+        })
+      }
+    }, 150)
   }
 
   return (
@@ -107,26 +112,24 @@ export default function Header() {
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
-          {/* ✅ Logo clickeable - vuelve al inicio con scroll suave */}
+        <div className="flex items-center justify-between h-16 md:h-20">
           <button
             onClick={scrollToTop}
-            className="flex items-center space-x-3 group cursor-pointer focus:outline-none"
+            className="flex items-center space-x-2 md:space-x-3 group cursor-pointer focus:outline-none"
             aria-label="Volver al inicio"
           >
             <motion.div
               whileHover={{ rotate: 360 }}
               transition={{ duration: 0.6 }}
-              className="w-12 h-12 bg-gradient-to-br from-[#D4AF37] to-[#AA7C11] rounded-xl flex items-center justify-center shadow-lg shadow-[#D4AF37]/20"
+              className="w-9 h-9 md:w-12 md:h-12 bg-gradient-to-br from-[#D4AF37] to-[#AA7C11] rounded-xl flex items-center justify-center shadow-lg shadow-[#D4AF37]/20"
             >
-              <span className="text-[#050505] font-bold text-xl">PS</span>
+              <span className="text-[#050505] font-bold text-sm md:text-xl">PS</span>
             </motion.div>
-            <span className="text-2xl font-light tracking-wider">
+            <span className="text-lg md:text-2xl font-light tracking-wider">
               PRISMA<span className="text-[#D4AF37] font-bold">SKY</span>
             </span>
           </button>
 
-          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-1">
             {navLinks.map((link) => (
               <Link
@@ -154,33 +157,32 @@ export default function Header() {
             </Link>
           </nav>
 
-          {/* ✅ Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="md:hidden p-2 text-[#DCDCDC] hover:text-[#D4AF37] transition-colors duration-300 relative z-50"
             aria-label={isMobileMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
           >
             {isMobileMenuOpen ? (
-              <FaTimes className="w-6 h-6" />
+              <FaTimes className="w-5 h-5 md:w-6 md:h-6" />
             ) : (
-              <FaBars className="w-6 h-6" />
+              <FaBars className="w-5 h-5 md:w-6 md:h-6" />
             )}
           </button>
         </div>
       </div>
 
-      {/* ✅ Mobile Menu - CORREGIDO Y FUNCIONAL */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
+            ref={menuRef}
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="md:hidden overflow-hidden bg-[#050505]/95 backdrop-blur-xl border-t border-[#D4AF37]/10 fixed top-20 left-0 right-0"
-            style={{ height: 'calc(100vh - 5rem)' }}
+            className="md:hidden overflow-hidden bg-[#050505]/98 backdrop-blur-xl border-t border-[#D4AF37]/10 fixed top-16 left-0 right-0"
+            style={{ height: 'calc(100vh - 4rem)' }}
           >
-            <div className="flex flex-col h-full px-4 py-6 space-y-2 overflow-y-auto">
+            <div className="flex flex-col h-full px-4 py-4 space-y-1 overflow-y-auto">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}

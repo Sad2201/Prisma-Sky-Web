@@ -6,10 +6,10 @@ import { motion, useInView } from 'framer-motion'
 import { gsap } from 'gsap'
 import Link from 'next/link'
 import {
-  FaLinkedin,
-  FaTwitter,
-  FaGithub,
-  FaYoutube,
+  FaInstagram, 
+  FaFacebook, 
+  FaYoutube, 
+  FaTiktok,
   FaArrowRight,
   FaCheck,
   FaCode,
@@ -123,10 +123,10 @@ const engineeringLinks = [
 ]
 
 const socialLinks = [
-  { icon: <FaLinkedin className="w-5 h-5" />, href: '#', label: 'LinkedIn' },
-  { icon: <FaTwitter className="w-5 h-5" />, href: '#', label: 'Twitter' },
-  { icon: <FaGithub className="w-5 h-5" />, href: '#', label: 'GitHub' },
-  { icon: <FaYoutube className="w-5 h-5" />, href: '#', label: 'YouTube' }
+  { icon: <FaInstagram className="w-5 h-5" />, href: '#', label: 'Instagram' },
+  { icon: <FaFacebook className="w-5 h-5" />, href: '#', label: 'Facebook' },
+  { icon: <FaYoutube className="w-5 h-5" />, href: '#', label: 'YouTube' },
+  { icon: <FaTiktok className="w-5 h-5" />, href: '#', label: 'TikTok' }
 ]
 
 // ============================================================

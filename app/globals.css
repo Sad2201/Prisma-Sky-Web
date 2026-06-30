@@ -1,59 +1,64 @@
-/* app/globals.css - VERSIÓN CORREGIDA */
+/* app/globals.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  /* Reducir animaciones en móvil para mejorar rendimiento */
+  @media (max-width: 768px) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+  
   * {
     @apply border-[#D4AF37]/10;
   }
-
+  
   html {
     scroll-behavior: smooth;
   }
-
+  
   body {
     @apply bg-[#050505] text-white antialiased overflow-x-hidden;
-    font-family:
-      system-ui,
-      -apple-system,
-      sans-serif;
+    font-family: system-ui, -apple-system, sans-serif;
   }
-
-  /* ✅ REMOVER DESENFOQUE EXCESIVO */
-  .section-reveal {
-    opacity: 0.95;
-    transform: translateY(20px) scale(0.99);
-    will-change: transform, opacity;
-    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .section-reveal.visible {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-
-  /* ✅ SCROLLBAR PERSONALIZADA - SUTIL */
+  
+  /* Scrollbar personalizada */
   ::-webkit-scrollbar {
-    width: 6px;
+    width: 4px;
   }
-
+  
   ::-webkit-scrollbar-track {
-    background: #0a0a0a;
+    background: #0A0A0A;
   }
-
+  
   ::-webkit-scrollbar-thumb {
-    background: #d4af37;
-    border-radius: 3px;
+    background: #D4AF37;
+    border-radius: 2px;
   }
-
+  
   ::-webkit-scrollbar-thumb:hover {
-    background: #aa7c11;
+    background: #AA7C11;
   }
 }
 
 @layer components {
   .bento-card {
     @apply transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)];
+  }
+  
+  .section-reveal {
+    opacity: 0.95;
+    transform: translateY(20px) scale(0.99);
+    will-change: transform, opacity;
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  .section-reveal.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }

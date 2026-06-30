@@ -1,11 +1,13 @@
 // app/layout.tsx
 import type { Metadata } from 'next'
 import './globals.css'
+import { Analytics } from '@vercel/analytics/react'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 
 export const metadata: Metadata = {
   title: 'PRISMA SKY',
   description: 'PRISMA SKY - Plataforma tecnológica premium',
-  keywords: 'prisma, sky, tecnología, premium, innovación',
+  keywords: 'prisma, sky, tecnología, premium, innovación, desarrollo web, IA, automatización',
   authors: [{ name: 'PRISMA SKY' }],
   creator: 'PRISMA SKY',
   publisher: 'PRISMA SKY',
@@ -13,16 +15,8 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'PRISMA SKY',
     description: 'PRISMA SKY - Plataforma tecnológica premium',
-    url: 'https://prismasky.com',
+    url: 'https://prismasky-web.vercel.app',
     siteName: 'PRISMA SKY',
-    images: [
-      {
-        url: '/og-image.jpg',
-        width: 1200,
-        height: 630,
-        alt: 'PRISMA SKY',
-      },
-    ],
     locale: 'es_ES',
     type: 'website',
   },
@@ -30,7 +24,6 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'PRISMA SKY',
     description: 'PRISMA SKY - Plataforma tecnológica premium',
-    images: ['/twitter-image.jpg'],
   },
   viewport: {
     width: 'device-width',
@@ -43,12 +36,6 @@ export const metadata: Metadata = {
     title: 'PRISMA SKY',
     statusBarStyle: 'black-translucent',
   },
-  formatDetection: {
-    telephone: false,
-  },
-  alternates: {
-    canonical: 'https://prismasky.com',
-  },
 }
 
 export default function RootLayout({
@@ -60,6 +47,8 @@ export default function RootLayout({
     <html lang="es">
       <body className="bg-[#050505] text-white antialiased overflow-x-hidden">
         {children}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   )
