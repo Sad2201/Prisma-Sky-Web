@@ -3,110 +3,24 @@
 
 import { useRef, useEffect, useState } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { PerspectiveCamera } from '@react-three/drei'
+import { PerspectiveCamera, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 
 // ============================================================
-// SHADER DEL PRISMA INTERACTIVO
+// PIRÁMIDE PRISMÁTICA CON SHADERS
 // ============================================================
 
-const vertexShader = `
-  uniform float uTime;
-  uniform vec2 uMouse;
-  
-  varying vec2 vUv;
-  varying float vElevation;
-  
-  void main() {
-    vUv = uv;
-    
-    vec3 pos = position;
-    
-    // Crear efecto prisma con ondas
-    float wave1 = sin(pos.x * 3.0 + uTime * 0.5) * 0.15;
-    float wave2 = cos(pos.y * 3.0 + uTime * 0.4) * 0.15;
-    float wave3 = sin((pos.x + pos.y) * 2.0 + uTime * 0.6) * 0.1;
-    
-    // Influencia del mouse
-    float mouseInfluence = 0.3;
-    vec2 mouseOffset = (uMouse - 0.5) * 2.0;
-    float mouseWave = sin(pos.x * 2.0 + pos.y * 2.0 + uTime * 0.3) * 0.1;
-    mouseWave += mouseOffset.x * 0.1 * pos.x;
-    mouseWave += mouseOffset.y * 0.1 * pos.y;
-    
-    float elevation = wave1 + wave2 + wave3 + mouseWave * mouseInfluence;
-    pos.z += elevation * 0.3;
-    
-    vElevation = elevation;
-    
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
-  }
-`
-
-const fragmentShader = `
-  uniform float uTime;
-  uniform vec2 uMouse;
-  
-  varying vec2 vUv;
-  varying float vElevation;
-  
-  void main() {
-    // Colores del prisma basados en la posición y tiempo
-    float hue = vUv.x * 0.8 + vUv.y * 0.2 + uTime * 0.03;
-    
-    // Paleta de colores dorados
-    vec3 color1 = vec3(0.831, 0.686, 0.216); // #D4AF37
-    vec3 color2 = vec3(0.667, 0.486, 0.067); // #AA7C11
-    vec3 color3 = vec3(0.965, 0.902, 0.722); // #F5E6B8
-    vec3 color4 = vec3(0.545, 0.490, 0.235); // #8B7D3C
-    
-    // Mezcla de colores con ondas
-    float mix1 = sin(hue * 6.283) * 0.5 + 0.5;
-    float mix2 = cos(hue * 6.283 + 1.5) * 0.5 + 0.5;
-    float mix3 = sin(hue * 6.283 + 3.0) * 0.5 + 0.5;
-    
-    vec3 color = mix(
-      mix(color1, color2, mix1),
-      mix(color3, color4, mix2),
-      mix3
-    );
-    
-    // Intensidad basada en elevación
-    float intensity = 0.3 + 0.7 * (vElevation * 2.0 + 0.5);
-    color *= intensity;
-    
-    // Brillo en los bordes
-    float edge = 1.0 - abs(vUv.x - 0.5) * 2.0;
-    edge *= 1.0 - abs(vUv.y - 0.5) * 2.0;
-    color += vec3(0.2, 0.15, 0.05) * edge * 0.3;
-    
-    // Efecto de brillo con el mouse
-    vec2 mouseDir = vUv - uMouse;
-    float mouseDist = length(mouseDir);
-    float mouseGlow = exp(-mouseDist * 8.0) * 0.3;
-    color += vec3(0.831, 0.686, 0.216) * mouseGlow;
-    
-    // Alpha con transparencia
-    float alpha = 0.15 + 0.25 * intensity;
-    alpha += edge * 0.1;
-    
-    gl_FragColor = vec4(color, alpha);
-  }
-`
-
-// ============================================================
-// COMPONENTE PRISMA
-// ============================================================
-
-const PrismaMesh = () => {
+const PrismaPyramid = () => {
   const meshRef = useRef<THREE.Mesh>(null)
-  const { viewport } = useThree()
-  const [mousePosition, setMousePosition] = useState({ x: 0.5, y: 0.5 })
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
+    setIsMobile(window.innerWidth < 768)
+    
     const handleMouseMove = (event: MouseEvent) => {
-      const x = event.clientX / window.innerWidth
-      const y = 1 - event.clientY / window.innerHeight
+      const x = (event.clientX / window.innerWidth) * 2 - 1
+      const y = -(event.clientY / window.innerHeight) * 2 + 1
       setMousePosition({ x, y })
     }
 
@@ -114,38 +28,106 @@ const PrismaMesh = () => {
     return () => window.removeEventListener('mousemove', handleMouseMove)
   }, [])
 
-  const uniforms = {
-    uTime: { value: 0 },
-    uMouse: { value: new THREE.Vector2(0.5, 0.5) }
-  }
-
   useFrame(({ clock }) => {
     const time = clock.getElapsedTime()
-    uniforms.uTime.value = time
-    uniforms.uMouse.value.lerp(
-      new THREE.Vector2(mousePosition.x, mousePosition.y),
-      0.05
-    )
     
     if (meshRef.current) {
-      meshRef.current.rotation.x = Math.sin(time * 0.05) * 0.05
-      meshRef.current.rotation.y = Math.sin(time * 0.03) * 0.05
+      // Rotación suave de la pirámide
+      meshRef.current.rotation.x = Math.sin(time * 0.15) * 0.1 + mousePosition.y * 0.1
+      meshRef.current.rotation.y = time * 0.15 + mousePosition.x * 0.3
+      meshRef.current.rotation.z = Math.sin(time * 0.1) * 0.05
+      
+      // Movimiento de flotación
+      meshRef.current.position.y = Math.sin(time * 0.3) * 0.1
     }
   })
 
-  const geometry = new THREE.PlaneGeometry(4, 4, 64, 64)
-  const material = new THREE.ShaderMaterial({
-    uniforms,
-    vertexShader,
-    fragmentShader,
+  // Geometría de pirámide con base prismática
+  const geometry = new THREE.ConeGeometry(1.5, 2.2, 6)
+  const edges = new THREE.EdgesGeometry(geometry)
+  
+  // Material con efecto prismático
+  const material = new THREE.MeshPhysicalMaterial({
+    color: new THREE.Color(0xD4AF37),
+    metalness: 0.8,
+    roughness: 0.15,
     transparent: true,
-    depthWrite: false,
-    side: THREE.DoubleSide,
+    opacity: 0.25,
+    wireframe: false,
+    emissive: new THREE.Color(0xD4AF37),
+    emissiveIntensity: 0.1,
+    clearcoat: 0.3,
+    clearcoatRoughness: 0.2,
+    envMapIntensity: 1.5,
+  })
+
+  // Material para los bordes brillantes
+  const edgeMaterial = new THREE.LineBasicMaterial({
+    color: 0xD4AF37,
+    transparent: true,
+    opacity: 0.4,
   })
 
   return (
-    <mesh ref={meshRef} geometry={geometry} material={material} />
+    <group>
+      {/* Pirámide principal */}
+      <mesh ref={meshRef} geometry={geometry} material={material} />
+      
+      {/* Bordes brillantes */}
+      <lineSegments geometry={edges} material={edgeMaterial} />
+      
+      {/* Partículas alrededor de la pirámide */}
+      <ParticleRing />
+    </group>
   )
+}
+
+// ============================================================
+// ANILLO DE PARTÍCULAS ALREDEDOR DE LA PIRÁMIDE
+// ============================================================
+
+const ParticleRing = () => {
+  const particlesRef = useRef<THREE.Points>(null)
+  const particleCount = 200
+  const positions = new Float32Array(particleCount * 3)
+  const colors = new Float32Array(particleCount * 3)
+
+  for (let i = 0; i < particleCount; i++) {
+    const angle = (i / particleCount) * Math.PI * 2
+    const radius = 1.8 + Math.random() * 0.5
+    const height = (Math.random() - 0.5) * 2.5
+    
+    positions[i * 3] = Math.cos(angle) * radius
+    positions[i * 3 + 1] = height
+    positions[i * 3 + 2] = Math.sin(angle) * radius
+    
+    const color = new THREE.Color(0xD4AF37)
+    color.multiplyScalar(0.5 + 0.5 * Math.random())
+    colors[i * 3] = color.r
+    colors[i * 3 + 1] = color.g
+    colors[i * 3 + 2] = color.b
+  }
+
+  const geometry = new THREE.BufferGeometry()
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3))
+
+  const material = new THREE.PointsMaterial({
+    size: 0.04,
+    transparent: true,
+    opacity: 0.6,
+    vertexColors: true,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+  })
+
+  useFrame(({ clock }) => {
+    if (particlesRef.current) {
+      particlesRef.current.rotation.y = clock.getElapsedTime() * 0.1
+    }
+  })
+
+  return <points ref={particlesRef} geometry={geometry} material={material} />
 }
 
 // ============================================================
@@ -157,6 +139,13 @@ export default function PrismaBackground() {
 
   useEffect(() => {
     setIsMobile(window.innerWidth < 768)
+    
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
   }, [])
 
   return (
@@ -168,7 +157,7 @@ export default function PrismaBackground() {
           alpha: true,
           powerPreference: 'high-performance',
           stencil: false,
-          depth: false,
+          depth: true,
         }}
         style={{
           position: 'fixed',
@@ -178,14 +167,15 @@ export default function PrismaBackground() {
           height: '100%',
           background: 'transparent',
         }}
-        frameloop={isMobile ? 'demand' : 'always'}
+        camera={{ 
+          position: [0, 0, isMobile ? 4.5 : 4], 
+          fov: isMobile ? 50 : 45 
+        }}
       >
-        <PerspectiveCamera 
-          makeDefault 
-          position={[0, 0, isMobile ? 3.5 : 3]} 
-          fov={isMobile ? 50 : 45}
-        />
-        <PrismaMesh />
+        <ambientLight intensity={0.5} />
+        <pointLight position={[10, 10, 10]} intensity={1} />
+        <pointLight position={[-10, -10, -10]} intensity={0.5} color="#D4AF37" />
+        <PrismaPyramid />
       </Canvas>
     </div>
   )

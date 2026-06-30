@@ -1,4 +1,4 @@
-// next.config.js - Versión final corregida
+// next.config.js
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
@@ -17,10 +17,13 @@ const nextConfig = {
     optimizeCss: true,
     scrollRestoration: true,
   },
+  // ✅ Configuración para mejor rendimiento
+  swcMinify: true,
   turbopack: {
-    // Configuración básica para Next.js 16
-    // Puedes expandir esto según necesidades futuras
-  },
+    resolveAlias: {
+      'three': 'three'
+    }
+  }
 }
 
 module.exports = nextConfig

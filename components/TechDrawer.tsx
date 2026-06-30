@@ -41,6 +41,10 @@ export interface ServiceContent {
   }
 }
 
+// ============================================================
+// CONTENIDO DE SERVICIOS
+// ============================================================
+
 const serviceContents: Record<ServiceId, ServiceContent> = {
   development: {
     id: 'development',
@@ -206,6 +210,10 @@ const serviceContents: Record<ServiceId, ServiceContent> = {
   }
 }
 
+// ============================================================
+// COMPONENTE PRINCIPAL
+// ============================================================
+
 export default function TechDrawer({ isOpen, serviceId, onClose }: TechDrawerProps) {
   const drawerRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
@@ -219,6 +227,7 @@ export default function TechDrawer({ isOpen, serviceId, onClose }: TechDrawerPro
   useEffect(() => {
     const drawer = drawerRef.current
     const content = contentRef.current
+    const scrollContainer = scrollContainerRef.current
 
     if (!drawer) return
 
@@ -236,8 +245,8 @@ export default function TechDrawer({ isOpen, serviceId, onClose }: TechDrawerPro
       document.body.style.overflow = 'hidden'
       
       // ✅ Resetear scroll al abrir
-      if (scrollContainerRef.current) {
-        scrollContainerRef.current.scrollTop = 0
+      if (scrollContainer) {
+        scrollContainer.scrollTop = 0
       }
     } else {
       gsap.to(drawer, {
@@ -280,6 +289,7 @@ export default function TechDrawer({ isOpen, serviceId, onClose }: TechDrawerPro
 
   return (
     <>
+      {/* ✅ Backdrop */}
       {isOpen && (
         <div 
           className="fixed inset-0 z-40 bg-[#050505]/80 backdrop-blur-sm"
@@ -287,61 +297,67 @@ export default function TechDrawer({ isOpen, serviceId, onClose }: TechDrawerPro
         />
       )}
 
+      {/* ✅ Drawer */}
       <div
         ref={drawerRef}
-        className="fixed inset-y-0 right-0 w-full md:w-[600px] z-50 bg-[#0A0A0A] border-l border-[#D4AF37]/20 shadow-2xl overflow-hidden"
+        className="fixed inset-y-0 right-0 w-full md:w-[600px] z-50 bg-[#0A0A0A] border-l border-[#D4AF37]/20 shadow-2xl"
         style={{ transform: 'translateX(100%)' }}
       >
-        {/* ✅ Contenedor con scroll interno - CORREGIDO */}
+        {/* ✅ Contenedor con scroll - CORREGIDO */}
         <div 
           ref={scrollContainerRef}
           className="h-full overflow-y-auto overflow-x-hidden"
           style={{ 
             overscrollBehavior: 'contain',
-            WebkitOverflowScrolling: 'touch'
+            WebkitOverflowScrolling: 'touch',
+            scrollbarWidth: 'thin',
+            scrollbarColor: '#D4AF37 transparent'
           }}
         >
-          <div ref={contentRef} className="p-6 md:p-8 pb-20">
-            {/* Header */}
-            <div className="flex items-start justify-between mb-6 sticky top-0 bg-[#0A0A0A] z-10 pt-2 pb-4">
-              <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <div 
-                    className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
-                    style={{ 
-                      background: `linear-gradient(135deg, ${service.color}20, ${service.color}10)`,
-                      border: `1px solid ${service.color}30`
-                    }}
-                  >
-                    {service.id === 'development' && <FaCode className="w-6 h-6 text-[#D4AF37]" />}
-                    {service.id === 'content' && <FaVideo className="w-6 h-6 text-[#D4AF37]" />}
-                    {service.id === 'automation' && <FaRobot className="w-6 h-6 text-[#D4AF37]" />}
-                  </div>
-                  <div className="min-w-0">
-                    <h2 className="text-xl md:text-2xl font-bold text-white truncate">
-                      {service.title}
-                    </h2>
-                    <p className="text-sm text-[#DCDCDC]/60 truncate">{service.subtitle}</p>
+          <div ref={contentRef} className="p-4 md:p-6 pb-32">
+            {/* ✅ Header - Sticky */}
+            <div className="sticky top-0 bg-[#0A0A0A] z-10 pt-2 pb-4 -mt-2 -mx-4 px-4 md:-mx-6 md:px-6 border-b border-[#D4AF37]/10 mb-6">
+              <div className="flex items-start justify-between">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div 
+                      className="w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center shrink-0"
+                      style={{ 
+                        background: `linear-gradient(135deg, ${service.color}20, ${service.color}10)`,
+                        border: `1px solid ${service.color}30`
+                      }}
+                    >
+                      {service.id === 'development' && <FaCode className="w-5 h-5 md:w-6 md:h-6 text-[#D4AF37]" />}
+                      {service.id === 'content' && <FaVideo className="w-5 h-5 md:w-6 md:h-6 text-[#D4AF37]" />}
+                      {service.id === 'automation' && <FaRobot className="w-5 h-5 md:w-6 md:h-6 text-[#D4AF37]" />}
+                    </div>
+                    <div className="min-w-0">
+                      <h2 className="text-base md:text-xl lg:text-2xl font-bold text-white truncate">
+                        {service.title}
+                      </h2>
+                      <p className="text-xs md:text-sm text-[#DCDCDC]/60 truncate">{service.subtitle}</p>
+                    </div>
                   </div>
                 </div>
+                <button
+                  onClick={onClose}
+                  className="p-2 rounded-lg hover:bg-[#D4AF37]/10 transition-colors duration-300 text-[#DCDCDC]/60 hover:text-[#D4AF37] shrink-0 ml-2"
+                >
+                  <FaTimes className="w-5 h-5 md:w-6 md:h-6" />
+                </button>
               </div>
-              <button
-                onClick={onClose}
-                className="p-2 rounded-lg hover:bg-[#D4AF37]/10 transition-colors duration-300 text-[#DCDCDC]/60 hover:text-[#D4AF37] shrink-0"
-              >
-                <FaTimes className="w-5 h-5 md:w-6 md:h-6" />
-              </button>
             </div>
 
+            {/* ✅ Descripción */}
             <p className="text-[#DCDCDC]/70 text-sm leading-relaxed mb-6">
               {service.description}
             </p>
 
-            {/* Tabs */}
-            <div className="flex gap-2 mb-6 border-b border-[#D4AF37]/10 sticky top-[72px] bg-[#0A0A0A] z-10 pt-2">
+            {/* ✅ Tabs */}
+            <div className="flex gap-2 mb-6 border-b border-[#D4AF37]/10 sticky top-[72px] md:top-[80px] bg-[#0A0A0A] z-10 pt-2 -mx-4 px-4 md:-mx-6 md:px-6">
               <button
                 onClick={() => setActiveTab('specs')}
-                className={`px-4 py-2 text-sm font-medium transition-all duration-300 ${
+                className={`px-3 md:px-4 py-2 text-xs md:text-sm font-medium transition-all duration-300 ${
                   activeTab === 'specs'
                     ? 'text-[#D4AF37] border-b-2 border-[#D4AF37]'
                     : 'text-[#DCDCDC]/40 hover:text-[#DCDCDC]/70'
@@ -351,7 +367,7 @@ export default function TechDrawer({ isOpen, serviceId, onClose }: TechDrawerPro
               </button>
               <button
                 onClick={() => setActiveTab('architecture')}
-                className={`px-4 py-2 text-sm font-medium transition-all duration-300 ${
+                className={`px-3 md:px-4 py-2 text-xs md:text-sm font-medium transition-all duration-300 ${
                   activeTab === 'architecture'
                     ? 'text-[#D4AF37] border-b-2 border-[#D4AF37]'
                     : 'text-[#DCDCDC]/40 hover:text-[#DCDCDC]/70'
@@ -361,8 +377,8 @@ export default function TechDrawer({ isOpen, serviceId, onClose }: TechDrawerPro
               </button>
             </div>
 
-            {/* Contenido */}
-            <div className="min-h-[400px] pb-4">
+            {/* ✅ Contenido */}
+            <div className="pb-20">
               {activeTab === 'specs' ? (
                 <>
                   {/* ✅ Navegación de especificaciones - Scroll horizontal */}
@@ -371,13 +387,13 @@ export default function TechDrawer({ isOpen, serviceId, onClose }: TechDrawerPro
                       <button
                         key={index}
                         onClick={() => setActiveSpecIndex(index)}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm whitespace-nowrap transition-all duration-300 shrink-0 ${
+                        className={`flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3 py-1.5 md:py-2 rounded-lg text-xs md:text-sm whitespace-nowrap transition-all duration-300 shrink-0 ${
                           activeSpecIndex === index
                             ? 'bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/20'
                             : 'text-[#DCDCDC]/40 hover:text-[#DCDCDC]/70 hover:bg-[#D4AF37]/5'
                         }`}
                       >
-                        {spec.icon}
+                        <span className="text-[#D4AF37]">{spec.icon}</span>
                         {spec.title}
                       </button>
                     ))}
@@ -387,20 +403,20 @@ export default function TechDrawer({ isOpen, serviceId, onClose }: TechDrawerPro
                   {currentSpec && (
                     <div className="bg-[#050505] rounded-lg border border-[#D4AF37]/10 p-4 md:p-6">
                       <div className="flex items-center gap-3 mb-4">
-                        <div className="w-10 h-10 rounded-lg bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] shrink-0">
+                        <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] shrink-0">
                           {currentSpec.icon}
                         </div>
-                        <div>
-                          <h3 className="text-base md:text-lg font-semibold text-white">
+                        <div className="min-w-0">
+                          <h3 className="text-sm md:text-lg font-semibold text-white truncate">
                             {currentSpec.title}
                           </h3>
-                          <p className="text-xs md:text-sm text-[#DCDCDC]/60">
+                          <p className="text-xs md:text-sm text-[#DCDCDC]/60 line-clamp-2">
                             {currentSpec.description}
                           </p>
                         </div>
                       </div>
 
-                      {/* ✅ Métricas - Grid responsive */}
+                      {/* ✅ Métricas */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
                         {currentSpec.metrics.map((metric, i) => (
                           <div
@@ -422,7 +438,7 @@ export default function TechDrawer({ isOpen, serviceId, onClose }: TechDrawerPro
                           {currentSpec.technologies.map((tech, i) => (
                             <span
                               key={i}
-                              className="text-xs px-3 py-1.5 bg-[#D4AF37]/5 border border-[#D4AF37]/10 rounded-lg text-[#DCDCDC]/70"
+                              className="text-xs px-2.5 md:px-3 py-1 md:py-1.5 bg-[#D4AF37]/5 border border-[#D4AF37]/10 rounded-lg text-[#DCDCDC]/70 truncate max-w-[120px] md:max-w-none"
                             >
                               {tech}
                             </span>
@@ -437,7 +453,7 @@ export default function TechDrawer({ isOpen, serviceId, onClose }: TechDrawerPro
                         </h4>
                         <ul className="space-y-1">
                           {currentSpec.deliverables.map((deliverable, i) => (
-                            <li key={i} className="flex items-start gap-2 text-sm text-[#DCDCDC]/60">
+                            <li key={i} className="flex items-start gap-2 text-xs md:text-sm text-[#DCDCDC]/60">
                               <FaArrowRight className="w-3 h-3 text-[#D4AF37] mt-1 shrink-0" />
                               <span>{deliverable}</span>
                             </li>
@@ -450,7 +466,7 @@ export default function TechDrawer({ isOpen, serviceId, onClose }: TechDrawerPro
               ) : (
                 /* ✅ Arquitectura */
                 <div className="bg-[#050505] rounded-lg border border-[#D4AF37]/10 p-4 md:p-6">
-                  <h3 className="text-base md:text-lg font-semibold text-white mb-2">
+                  <h3 className="text-sm md:text-lg font-semibold text-white mb-2">
                     {service.architecture.title}
                   </h3>
                   <p className="text-xs md:text-sm text-[#DCDCDC]/60 leading-relaxed mb-4">
@@ -460,10 +476,10 @@ export default function TechDrawer({ isOpen, serviceId, onClose }: TechDrawerPro
                     {service.architecture.diagram.map((item, i) => (
                       <div
                         key={i}
-                        className="flex items-center gap-3 text-sm text-[#DCDCDC]/70 bg-[#D4AF37]/5 rounded-lg px-4 py-2 border border-[#D4AF37]/5"
+                        className="flex items-center gap-3 text-xs md:text-sm text-[#DCDCDC]/70 bg-[#D4AF37]/5 rounded-lg px-3 md:px-4 py-2 border border-[#D4AF37]/5"
                       >
                         <div className="w-2 h-2 rounded-full bg-[#D4AF37] shrink-0" />
-                        <span className="text-xs md:text-sm">{item}</span>
+                        <span>{item}</span>
                       </div>
                     ))}
                   </div>
@@ -471,8 +487,8 @@ export default function TechDrawer({ isOpen, serviceId, onClose }: TechDrawerPro
               )}
             </div>
 
-            {/* ✅ Footer del drawer - Sticky */}
-            <div className="sticky bottom-0 bg-[#0A0A0A] pt-4 pb-2 border-t border-[#D4AF37]/10 -mx-6 px-6 md:-mx-8 md:px-8">
+            {/* ✅ Footer del drawer - Sticky bottom */}
+            <div className="fixed bottom-0 left-0 right-0 bg-[#0A0A0A] border-t border-[#D4AF37]/10 p-4 md:p-6">
               <button
                 onClick={onClose}
                 className="w-full px-6 py-3 bg-gradient-to-r from-[#D4AF37] to-[#AA7C11] text-[#050505] font-semibold rounded-lg hover:shadow-lg hover:shadow-[#D4AF37]/20 transition-all duration-300 text-sm md:text-base"
@@ -483,6 +499,23 @@ export default function TechDrawer({ isOpen, serviceId, onClose }: TechDrawerPro
           </div>
         </div>
       </div>
+
+      {/* ✅ Estilos para scrollbar */}
+      <style jsx>{`
+        .scrollbar-thin::-webkit-scrollbar {
+          height: 4px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+          background: rgba(212, 175, 55, 0.2);
+          border-radius: 2px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+          background: rgba(212, 175, 55, 0.4);
+        }
+      `}</style>
     </>
   )
 }

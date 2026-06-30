@@ -1,41 +1,21 @@
-// app/page.tsx
+// app/page.tsx - OPTIMIZADO
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, Suspense, lazy } from 'react'
 import { motion, useScroll, useSpring } from 'framer-motion'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import dynamic from 'next/dynamic'
 
-// ✅ Importación dinámica del Canvas Hero
-const HeroCanvas = dynamic(
-  () => import('@/components/HeroCanvas'),
-  { 
-    ssr: false,
-    loading: () => (
-      <div className="fixed inset-0 -z-10 bg-[#050505]">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#D4AF37]/5 to-transparent animate-pulse" />
-      </div>
-    )
-  }
-)
-
-// ✅ Importación del Prisma Background
-const PrismaBackground = dynamic(
-  () => import('@/components/PrismaBackground'),
-  { 
-    ssr: false,
-    loading: () => null
-  }
-)
-
-import Header from '@/components/Header'
-import HeroSection from '@/components/HeroSection'
-import BentoGrid from '@/components/BentoGrid'
-import Methodology from '@/components/Methodology'
-import AboutCompany from '@/components/AboutCompany'
-import TechDocs from '@/components/TechDocs'
-import Footer from '@/components/Footer'
+// ✅ Lazy loading con Suspense
+const HeroCanvas = lazy(() => import('@/components/HeroCanvas'))
+const PrismaBackground = lazy(() => import('@/components/PrismaBackground'))
+const Header = lazy(() => import('@/components/Header'))
+const HeroSection = lazy(() => import('@/components/HeroSection'))
+const BentoGrid = lazy(() => import('@/components/BentoGrid'))
+const Methodology = lazy(() => import('@/components/Methodology'))
+const AboutCompany = lazy(() => import('@/components/AboutCompany'))
+const TechDocs = lazy(() => import('@/components/TechDocs'))
+const Footer = lazy(() => import('@/components/Footer'))
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger)
@@ -60,17 +40,11 @@ export default function Home() {
       
       sections.forEach((section) => {
         gsap.fromTo(section,
-          { 
-            opacity: 0.4,
-            y: 40,
-            scale: 0.97,
-            filter: 'blur(2px)'
-          },
+          { opacity: 0.4, y: 40, scale: 0.97 },
           {
             opacity: 1,
             y: 0,
             scale: 1,
-            filter: 'blur(0px)',
             duration: 1.2,
             ease: 'power3.out',
             scrollTrigger: {
@@ -84,7 +58,6 @@ export default function Home() {
         )
       })
 
-      // ✅ Progress bar
       gsap.to('.progress-bar-fill', {
         width: '100%',
         scrollTrigger: {
@@ -95,7 +68,6 @@ export default function Home() {
         }
       })
 
-      // ✅ Smooth scroll para enlaces
       document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', (e) => {
           e.preventDefault()
@@ -122,67 +94,77 @@ export default function Home() {
 
   return (
     <div ref={mainRef} className="min-h-screen bg-[#050505] relative">
-      {/* ✅ PRISMA BACKGROUND - INTERACTIVO Y FIJO */}
-      <PrismaBackground />
+      {/* ✅ Prisma Background - Carga diferida */}
+      <Suspense fallback={null}>
+        <PrismaBackground />
+      </Suspense>
 
-      {/* ✅ Canvas 3D - Encima del prisma */}
-      <div className="fixed inset-0 -z-10">
-        <HeroCanvas />
-      </div>
+      {/* ✅ Canvas Hero - Carga diferida */}
+      <Suspense fallback={null}>
+        <div className="fixed inset-0 -z-10">
+          <HeroCanvas />
+        </div>
+      </Suspense>
 
       {/* Progress Bar */}
       <div className="fixed top-0 left-0 right-0 h-[2px] bg-[#D4AF37]/10 z-50">
         <div className="progress-bar-fill h-full bg-gradient-to-r from-[#D4AF37] to-[#AA7C11] w-0" />
       </div>
 
-      {/* Overlay Gradient */}
+      {/* Overlay */}
       <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute inset-0 bg-gradient-to-b from-[#050505]/0 via-[#050505]/20 to-[#050505]/60" />
       </div>
 
       {/* Contenido */}
       <div className="relative z-10">
-        <Header />
+        <Suspense fallback={<div className="h-16" />}>
+          <Header />
+        </Suspense>
         
         <main>
           <div className="section-reveal" id="inicio">
-            <HeroSection />
+            <Suspense fallback={<div className="min-h-screen" />}>
+              <HeroSection />
+            </Suspense>
           </div>
 
           <div className="section-reveal" id="servicios">
-            <BentoGrid />
+            <Suspense fallback={<div className="min-h-[400px]" />}>
+              <BentoGrid />
+            </Suspense>
           </div>
 
           <div className="section-reveal" id="metodologia">
-            <Methodology />
+            <Suspense fallback={<div className="min-h-[400px]" />}>
+              <Methodology />
+            </Suspense>
           </div>
 
           <div className="section-reveal" id="empresa">
-            <AboutCompany />
+            <Suspense fallback={<div className="min-h-[400px]" />}>
+              <AboutCompany />
+            </Suspense>
           </div>
 
           <div className="section-reveal" id="documentacion">
-            <TechDocs />
+            <Suspense fallback={<div className="min-h-[400px]" />}>
+              <TechDocs />
+            </Suspense>
           </div>
 
           <div className="section-reveal" id="postular">
-            <Footer />
+            <Suspense fallback={<div className="min-h-[400px]" />}>
+              <Footer />
+            </Suspense>
           </div>
         </main>
       </div>
 
       <style jsx>{`
         .section-reveal {
-          will-change: transform, opacity, filter;
+          will-change: transform, opacity;
           transition: all 0.3s ease;
-        }
-        
-        @media (prefers-reduced-motion: reduce) {
-          .section-reveal {
-            opacity: 1 !important;
-            transform: none !important;
-            filter: none !important;
-          }
         }
       `}</style>
     </div>
