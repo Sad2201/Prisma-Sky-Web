@@ -1,4 +1,4 @@
-// components/TechDrawer.tsx
+// components/TechDrawer.tsx - VERSIÓN COMPLETA CORREGIDA
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
@@ -215,6 +215,7 @@ export default function TechDrawer({ isOpen, serviceId, onClose }: TechDrawerPro
 
   const service = serviceId ? serviceContents[serviceId] : null
 
+  // ✅ Animación de entrada/salida
   useEffect(() => {
     const drawer = drawerRef.current
     const content = contentRef.current
@@ -234,6 +235,7 @@ export default function TechDrawer({ isOpen, serviceId, onClose }: TechDrawerPro
 
       document.body.style.overflow = 'hidden'
       
+      // ✅ Resetear scroll al abrir
       if (scrollContainerRef.current) {
         scrollContainerRef.current.scrollTop = 0
       }
@@ -254,6 +256,7 @@ export default function TechDrawer({ isOpen, serviceId, onClose }: TechDrawerPro
     }
   }, [isOpen, service])
 
+  // ✅ Keyboard handling
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
@@ -265,6 +268,7 @@ export default function TechDrawer({ isOpen, serviceId, onClose }: TechDrawerPro
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [isOpen, onClose])
 
+  // ✅ Resetear estado cuando cambia el servicio
   useEffect(() => {
     setActiveSpecIndex(0)
     setActiveTab('specs')
@@ -288,18 +292,22 @@ export default function TechDrawer({ isOpen, serviceId, onClose }: TechDrawerPro
         className="fixed inset-y-0 right-0 w-full md:w-[600px] z-50 bg-[#0A0A0A] border-l border-[#D4AF37]/20 shadow-2xl overflow-hidden"
         style={{ transform: 'translateX(100%)' }}
       >
+        {/* ✅ Contenedor con scroll interno - CORREGIDO */}
         <div 
           ref={scrollContainerRef}
           className="h-full overflow-y-auto overflow-x-hidden"
-          style={{ overscrollBehavior: 'contain' }}
+          style={{ 
+            overscrollBehavior: 'contain',
+            WebkitOverflowScrolling: 'touch'
+          }}
         >
-          <div ref={contentRef} className="p-6 md:p-8">
+          <div ref={contentRef} className="p-6 md:p-8 pb-20">
             {/* Header */}
-            <div className="flex items-start justify-between mb-6">
+            <div className="flex items-start justify-between mb-6 sticky top-0 bg-[#0A0A0A] z-10 pt-2 pb-4">
               <div>
                 <div className="flex items-center gap-3 mb-2">
                   <div 
-                    className="w-12 h-12 rounded-xl flex items-center justify-center"
+                    className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
                     style={{ 
                       background: `linear-gradient(135deg, ${service.color}20, ${service.color}10)`,
                       border: `1px solid ${service.color}30`
@@ -309,17 +317,19 @@ export default function TechDrawer({ isOpen, serviceId, onClose }: TechDrawerPro
                     {service.id === 'content' && <FaVideo className="w-6 h-6 text-[#D4AF37]" />}
                     {service.id === 'automation' && <FaRobot className="w-6 h-6 text-[#D4AF37]" />}
                   </div>
-                  <div>
-                    <h2 className="text-2xl font-bold text-white">{service.title}</h2>
-                    <p className="text-sm text-[#DCDCDC]/60">{service.subtitle}</p>
+                  <div className="min-w-0">
+                    <h2 className="text-xl md:text-2xl font-bold text-white truncate">
+                      {service.title}
+                    </h2>
+                    <p className="text-sm text-[#DCDCDC]/60 truncate">{service.subtitle}</p>
                   </div>
                 </div>
               </div>
               <button
                 onClick={onClose}
-                className="p-2 rounded-lg hover:bg-[#D4AF37]/10 transition-colors duration-300 text-[#DCDCDC]/60 hover:text-[#D4AF37]"
+                className="p-2 rounded-lg hover:bg-[#D4AF37]/10 transition-colors duration-300 text-[#DCDCDC]/60 hover:text-[#D4AF37] shrink-0"
               >
-                <FaTimes className="w-6 h-6" />
+                <FaTimes className="w-5 h-5 md:w-6 md:h-6" />
               </button>
             </div>
 
@@ -328,7 +338,7 @@ export default function TechDrawer({ isOpen, serviceId, onClose }: TechDrawerPro
             </p>
 
             {/* Tabs */}
-            <div className="flex gap-2 mb-6 border-b border-[#D4AF37]/10">
+            <div className="flex gap-2 mb-6 border-b border-[#D4AF37]/10 sticky top-[72px] bg-[#0A0A0A] z-10 pt-2">
               <button
                 onClick={() => setActiveTab('specs')}
                 className={`px-4 py-2 text-sm font-medium transition-all duration-300 ${
@@ -337,7 +347,7 @@ export default function TechDrawer({ isOpen, serviceId, onClose }: TechDrawerPro
                     : 'text-[#DCDCDC]/40 hover:text-[#DCDCDC]/70'
                 }`}
               >
-                Especificaciones Técnicas
+                Especificaciones
               </button>
               <button
                 onClick={() => setActiveTab('architecture')}
@@ -352,15 +362,16 @@ export default function TechDrawer({ isOpen, serviceId, onClose }: TechDrawerPro
             </div>
 
             {/* Contenido */}
-            <div className="min-h-[400px]">
+            <div className="min-h-[400px] pb-4">
               {activeTab === 'specs' ? (
                 <>
-                  <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
+                  {/* ✅ Navegación de especificaciones - Scroll horizontal */}
+                  <div className="flex gap-2 mb-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-[#D4AF37]/20 scrollbar-track-transparent">
                     {service.specs.map((spec, index) => (
                       <button
                         key={index}
                         onClick={() => setActiveSpecIndex(index)}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm whitespace-nowrap transition-all duration-300 ${
+                        className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm whitespace-nowrap transition-all duration-300 shrink-0 ${
                           activeSpecIndex === index
                             ? 'bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/20'
                             : 'text-[#DCDCDC]/40 hover:text-[#DCDCDC]/70 hover:bg-[#D4AF37]/5'
@@ -372,34 +383,37 @@ export default function TechDrawer({ isOpen, serviceId, onClose }: TechDrawerPro
                     ))}
                   </div>
 
+                  {/* ✅ Detalle de especificación */}
                   {currentSpec && (
-                    <div className="bg-[#050505] rounded-lg border border-[#D4AF37]/10 p-6">
+                    <div className="bg-[#050505] rounded-lg border border-[#D4AF37]/10 p-4 md:p-6">
                       <div className="flex items-center gap-3 mb-4">
-                        <div className="w-10 h-10 rounded-lg bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37]">
+                        <div className="w-10 h-10 rounded-lg bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] shrink-0">
                           {currentSpec.icon}
                         </div>
                         <div>
-                          <h3 className="text-lg font-semibold text-white">
+                          <h3 className="text-base md:text-lg font-semibold text-white">
                             {currentSpec.title}
                           </h3>
-                          <p className="text-sm text-[#DCDCDC]/60">
+                          <p className="text-xs md:text-sm text-[#DCDCDC]/60">
                             {currentSpec.description}
                           </p>
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-2 mb-4">
+                      {/* ✅ Métricas - Grid responsive */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
                         {currentSpec.metrics.map((metric, i) => (
                           <div
                             key={i}
                             className="flex items-center gap-2 text-xs text-[#DCDCDC]/60 bg-[#D4AF37]/5 rounded-lg px-3 py-2"
                           >
-                            <FaCheckCircle className="w-3 h-3 text-[#D4AF37]" />
-                            {metric}
+                            <FaCheckCircle className="w-3 h-3 text-[#D4AF37] shrink-0" />
+                            <span className="truncate">{metric}</span>
                           </div>
                         ))}
                       </div>
 
+                      {/* ✅ Tecnologías */}
                       <div className="mb-4">
                         <h4 className="text-xs uppercase tracking-[0.15em] text-[#DCDCDC]/40 font-medium mb-2">
                           Tecnologías
@@ -416,6 +430,7 @@ export default function TechDrawer({ isOpen, serviceId, onClose }: TechDrawerPro
                         </div>
                       </div>
 
+                      {/* ✅ Deliverables */}
                       <div>
                         <h4 className="text-xs uppercase tracking-[0.15em] text-[#DCDCDC]/40 font-medium mb-2">
                           Deliverables
@@ -424,7 +439,7 @@ export default function TechDrawer({ isOpen, serviceId, onClose }: TechDrawerPro
                           {currentSpec.deliverables.map((deliverable, i) => (
                             <li key={i} className="flex items-start gap-2 text-sm text-[#DCDCDC]/60">
                               <FaArrowRight className="w-3 h-3 text-[#D4AF37] mt-1 shrink-0" />
-                              {deliverable}
+                              <span>{deliverable}</span>
                             </li>
                           ))}
                         </ul>
@@ -433,11 +448,12 @@ export default function TechDrawer({ isOpen, serviceId, onClose }: TechDrawerPro
                   )}
                 </>
               ) : (
-                <div className="bg-[#050505] rounded-lg border border-[#D4AF37]/10 p-6">
-                  <h3 className="text-lg font-semibold text-white mb-2">
+                /* ✅ Arquitectura */
+                <div className="bg-[#050505] rounded-lg border border-[#D4AF37]/10 p-4 md:p-6">
+                  <h3 className="text-base md:text-lg font-semibold text-white mb-2">
                     {service.architecture.title}
                   </h3>
-                  <p className="text-sm text-[#DCDCDC]/60 leading-relaxed mb-4">
+                  <p className="text-xs md:text-sm text-[#DCDCDC]/60 leading-relaxed mb-4">
                     {service.architecture.description}
                   </p>
                   <div className="space-y-2">
@@ -446,8 +462,8 @@ export default function TechDrawer({ isOpen, serviceId, onClose }: TechDrawerPro
                         key={i}
                         className="flex items-center gap-3 text-sm text-[#DCDCDC]/70 bg-[#D4AF37]/5 rounded-lg px-4 py-2 border border-[#D4AF37]/5"
                       >
-                        <div className="w-2 h-2 rounded-full bg-[#D4AF37]" />
-                        {item}
+                        <div className="w-2 h-2 rounded-full bg-[#D4AF37] shrink-0" />
+                        <span className="text-xs md:text-sm">{item}</span>
                       </div>
                     ))}
                   </div>
@@ -455,10 +471,11 @@ export default function TechDrawer({ isOpen, serviceId, onClose }: TechDrawerPro
               )}
             </div>
 
-            <div className="mt-6 pt-6 border-t border-[#D4AF37]/10">
+            {/* ✅ Footer del drawer - Sticky */}
+            <div className="sticky bottom-0 bg-[#0A0A0A] pt-4 pb-2 border-t border-[#D4AF37]/10 -mx-6 px-6 md:-mx-8 md:px-8">
               <button
                 onClick={onClose}
-                className="w-full px-6 py-3 bg-gradient-to-r from-[#D4AF37] to-[#AA7C11] text-[#050505] font-semibold rounded-lg hover:shadow-lg hover:shadow-[#D4AF37]/20 transition-all duration-300"
+                className="w-full px-6 py-3 bg-gradient-to-r from-[#D4AF37] to-[#AA7C11] text-[#050505] font-semibold rounded-lg hover:shadow-lg hover:shadow-[#D4AF37]/20 transition-all duration-300 text-sm md:text-base"
               >
                 Solicitar asesoría técnica
               </button>

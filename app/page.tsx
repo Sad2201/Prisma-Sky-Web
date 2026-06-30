@@ -1,4 +1,4 @@
-// app/page.tsx - VERSIÓN COMPLETA CORREGIDA
+// app/page.tsx
 'use client'
 
 import { useEffect, useRef } from 'react'
@@ -7,7 +7,7 @@ import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import dynamic from 'next/dynamic'
 
-// Importación dinámica del Canvas
+// ✅ Importación dinámica del Canvas Hero
 const HeroCanvas = dynamic(
   () => import('@/components/HeroCanvas'),
   { 
@@ -17,6 +17,15 @@ const HeroCanvas = dynamic(
         <div className="absolute inset-0 bg-gradient-to-b from-[#D4AF37]/5 to-transparent animate-pulse" />
       </div>
     )
+  }
+)
+
+// ✅ Importación del Prisma Background
+const PrismaBackground = dynamic(
+  () => import('@/components/PrismaBackground'),
+  { 
+    ssr: false,
+    loading: () => null
   }
 )
 
@@ -47,10 +56,9 @@ export default function Home() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // ✅ ANIMACIONES DE SCROLL SUAVES
       const sections = document.querySelectorAll('.section-reveal')
       
-      sections.forEach((section, index) => {
+      sections.forEach((section) => {
         gsap.fromTo(section,
           { 
             opacity: 0.4,
@@ -76,46 +84,7 @@ export default function Home() {
         )
       })
 
-      // ✅ ANIMACIÓN DEL HERO
-      const heroContent = document.querySelector('#inicio .hero-content')
-      if (heroContent) {
-        gsap.fromTo(heroContent,
-          { opacity: 0, y: 30, scale: 0.98 },
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            duration: 1,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: '#inicio',
-              start: 'top bottom-=50',
-              toggleActions: 'play none none reverse'
-            }
-          }
-        )
-      }
-
-      // ✅ ANIMACIÓN DE MÉTRICAS
-      const metrics = document.querySelectorAll('.hero-metric')
-      metrics.forEach((metric, index) => {
-        gsap.fromTo(metric,
-          { opacity: 0, y: 20 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.6,
-            delay: index * 0.1,
-            scrollTrigger: {
-              trigger: '.hero-metrics',
-              start: 'top bottom-=50',
-              toggleActions: 'play none none reverse'
-            }
-          }
-        )
-      })
-
-      // ✅ PROGRESS BAR CON SCROLL
+      // ✅ Progress bar
       gsap.to('.progress-bar-fill', {
         width: '100%',
         scrollTrigger: {
@@ -126,7 +95,7 @@ export default function Home() {
         }
       })
 
-      // ✅ SMOOTH SCROLL CORREGIDO - SIN scrollTo
+      // ✅ Smooth scroll para enlaces
       document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', (e) => {
           e.preventDefault()
@@ -135,8 +104,6 @@ export default function Home() {
             const target = document.querySelector(href)
             if (target) {
               const targetPosition = target.getBoundingClientRect().top + window.scrollY - 80
-              
-              // ✅ Usar window.scrollTo con objeto de opciones
               window.scrollTo({
                 top: targetPosition,
                 behavior: 'smooth'
@@ -145,7 +112,6 @@ export default function Home() {
           }
         })
       })
-
     }, mainRef)
 
     return () => {
@@ -156,7 +122,10 @@ export default function Home() {
 
   return (
     <div ref={mainRef} className="min-h-screen bg-[#050505] relative">
-      {/* Canvas 3D */}
+      {/* ✅ PRISMA BACKGROUND - INTERACTIVO Y FIJO */}
+      <PrismaBackground />
+
+      {/* ✅ Canvas 3D - Encima del prisma */}
       <div className="fixed inset-0 -z-10">
         <HeroCanvas />
       </div>
