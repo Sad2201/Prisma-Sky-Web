@@ -17,9 +17,9 @@ const nextConfig = {
     optimizeCss: true,
     scrollRestoration: true,
   },
-  // ✅ Configuración para mejor rendimiento
-  swcMinify: true,
+  // ✅ Agregar turbopack.root para silenciar el warning
   turbopack: {
+    root: process.cwd(),
     resolveAlias: {
       'three': 'three'
     }

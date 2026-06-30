@@ -4,17 +4,8 @@
 @tailwind utilities;
 
 @layer base {
-  /* Reducir animaciones en móvil para mejorar rendimiento */
-  @media (max-width: 768px) {
-    * {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-    }
-  }
-  
   * {
-    @apply border-[#D4AF37]/10;
+    border-color: rgba(212, 175, 55, 0.1);
   }
   
   html {
@@ -22,11 +13,13 @@
   }
   
   body {
-    @apply bg-[#050505] text-white antialiased overflow-x-hidden;
-    font-family: system-ui, -apple-system, sans-serif;
+    background-color: #050505;
+    color: white;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
   }
   
-  /* Scrollbar personalizada */
   ::-webkit-scrollbar {
     width: 4px;
   }
@@ -46,10 +39,6 @@
 }
 
 @layer components {
-  .bento-card {
-    @apply transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)];
-  }
-  
   .section-reveal {
     opacity: 0.95;
     transform: translateY(20px) scale(0.99);

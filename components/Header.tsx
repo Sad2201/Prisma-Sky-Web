@@ -45,9 +45,7 @@ export default function Header() {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (isMobileMenuOpen) {
-        setIsMobileMenuOpen(false)
-      }
+      if (isMobileMenuOpen) setIsMobileMenuOpen(false)
     }
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
@@ -59,9 +57,7 @@ export default function Header() {
     } else {
       document.body.style.overflow = 'unset'
     }
-    return () => {
-      document.body.style.overflow = 'unset'
-    }
+    return () => { document.body.style.overflow = 'unset' }
   }, [isMobileMenuOpen])
 
   useEffect(() => {
@@ -92,10 +88,7 @@ export default function Header() {
       const target = document.querySelector(href)
       if (target) {
         const targetPosition = target.getBoundingClientRect().top + window.scrollY - 80
-        window.scrollTo({
-          top: targetPosition,
-          behavior: 'smooth'
-        })
+        window.scrollTo({ top: targetPosition, behavior: 'smooth' })
       }
     }, 150)
   }

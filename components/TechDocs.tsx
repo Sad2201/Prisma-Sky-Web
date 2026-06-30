@@ -1,4 +1,4 @@
-// components/TechDocs.tsx - Versión corregida
+// components/TechDocs.tsx
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
@@ -9,8 +9,8 @@ import {
   FaCode, 
   FaServer, 
   FaNetworkWired,
-  FaCodeBranch,  // ← Reemplaza FaGitBranch con FaCodeBranch
-  FaGitAlt        // ← Alternativa si prefieres
+  FaCodeBranch,
+  FaGitAlt
 } from 'react-icons/fa'
 
 if (typeof window !== 'undefined') {
@@ -65,7 +65,7 @@ export async function POST(req: Request) {
   {
     id: 'deployment',
     label: 'Deployment Pipeline',
-    icon: <FaCodeBranch className="w-4 h-4" />, // ← Ahora usa FaCodeBranch
+    icon: <FaCodeBranch className="w-4 h-4" />,
     language: 'yaml',
     content: `# 🚀 CI/CD Pipeline Configuration
 # PRISMA SKY - Deployment Strategy
@@ -295,7 +295,7 @@ export default function TechDocs() {
           <div className="inline-flex items-center gap-4 px-6 py-3 bg-[#050505] border border-[#D4AF37]/10 rounded-full">
             <FaNetworkWired className="w-4 h-4 text-[#D4AF37]" />
             <span className="text-xs text-[#DCDCDC]/60 font-mono">
-              Proyecto: <span className="text-[#D4AF37]">sard2201/prismasky-web</span>
+              Proyecto: <span className="text-[#D4AF37]">Sard2201/prismasky-web</span>
             </span>
           </div>
         </motion.div>
