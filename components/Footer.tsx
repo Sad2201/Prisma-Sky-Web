@@ -1,4 +1,4 @@
-// components/Footer.tsx - VERSIÓN COMPLETA REDISEÑADA CON NOTIFICACIONES
+// components/Footer.tsx - VERSIÓN COMPLETA
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
@@ -6,10 +6,6 @@ import { motion, useInView } from 'framer-motion'
 import { gsap } from 'gsap'
 import Link from 'next/link'
 import {
-  FaInstagram, 
-  FaFacebook, 
-  FaYoutube, 
-  FaTiktok,
   FaArrowRight,
   FaCheck,
   FaCode,
@@ -27,7 +23,11 @@ import {
   FaArrowLeft,
   FaRocket,
   FaChartLine,
-  FaCogs
+  FaCogs,
+  FaInstagram,
+  FaFacebook,
+  FaYoutube,
+  FaTiktok
 } from 'react-icons/fa'
 import ToastNotification from './ToastNotification'
 import SectionBackground from './SectionBackground'
@@ -114,19 +114,40 @@ const budgetOptions = [
   }
 ]
 
+// ✅ Redes sociales con aria-label para accesibilidad
+const socialLinks = [
+  { 
+    icon: <FaInstagram className="w-5 h-5" />, 
+    href: 'https://instagram.com/prismasky', 
+    label: 'Instagram',
+    ariaLabel: 'Síguenos en Instagram - PRISMA SKY'
+  },
+  { 
+    icon: <FaFacebook className="w-5 h-5" />, 
+    href: 'https://facebook.com/prismasky', 
+    label: 'Facebook',
+    ariaLabel: 'Síguenos en Facebook - PRISMA SKY'
+  },
+  { 
+    icon: <FaYoutube className="w-5 h-5" />, 
+    href: 'https://youtube.com/@prismasky', 
+    label: 'YouTube',
+    ariaLabel: 'Síguenos en YouTube - PRISMA SKY'
+  },
+  { 
+    icon: <FaTiktok className="w-5 h-5" />, 
+    href: 'https://tiktok.com/@prismasky', 
+    label: 'TikTok',
+    ariaLabel: 'Síguenos en TikTok - PRISMA SKY'
+  }
+]
+
 const engineeringLinks = [
   { label: 'Arquitectura de Software', href: '#', icon: <FaCode className="w-3 h-3" /> },
   { label: 'Open Source', href: '#', icon: <FaGitAlt className="w-3 h-3" /> },
   { label: 'Status del Sistema', href: '#', icon: <FaCloud className="w-3 h-3" /> },
   { label: 'Documentación de API', href: '#documentacion', icon: <FaFileAlt className="w-3 h-3" /> },
   { label: 'GitHub Corporativo', href: '#', icon: <FaDatabase className="w-3 h-3" /> }
-]
-
-const socialLinks = [
-  { icon: <FaInstagram className="w-5 h-5" />, href: '#', label: 'Instagram' },
-  { icon: <FaFacebook className="w-5 h-5" />, href: '#', label: 'Facebook' },
-  { icon: <FaYoutube className="w-5 h-5" />, href: '#', label: 'YouTube' },
-  { icon: <FaTiktok className="w-5 h-5" />, href: '#', label: 'TikTok' }
 ]
 
 // ============================================================
@@ -234,7 +255,6 @@ export default function Footer() {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [touchedFields, setTouchedFields] = useState<Set<keyof FormData>>(new Set())
   
-  // ✅ Estado para la notificación
   const [toast, setToast] = useState<ToastState>({
     show: false,
     message: '',
@@ -313,14 +333,12 @@ export default function Footer() {
         throw new Error(errorMessage)
       }
 
-      // ✅ ÉXITO - Mostrar notificación
       setToast({
         show: true,
         message: '✅ Tu postulación ha sido recibida exitosamente. Nuestro equipo de ingeniería evaluará tu infraestructura en las próximas 24 horas.',
         type: 'success'
       })
 
-      // Animación de desvanecimiento del formulario
       if (formRef.current) {
         gsap.to(formRef.current, {
           opacity: 0,
@@ -352,7 +370,6 @@ export default function Footer() {
       console.error('Error al enviar:', error)
       setIsSubmitting(false)
 
-      // ✅ ERROR - Mostrar notificación de error
       const errorMessage = error instanceof Error ? error.message : 'Error al enviar el formulario'
       
       setToast({
@@ -368,7 +385,6 @@ export default function Footer() {
     }
   }
 
-  // Resetear errores de submit al cambiar de paso
   useEffect(() => {
     setErrors(prev => ({ ...prev, submit: undefined }))
   }, [currentStep])
@@ -418,7 +434,6 @@ export default function Footer() {
         ref={ref}
         className="bg-[#0A0A0A] relative overflow-hidden"
       >
-        {/* ✅ Fondo dinámico */}
         <SectionBackground variant="glow" intensity="medium" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10">
@@ -467,6 +482,7 @@ export default function Footer() {
                 </div>
               </div>
 
+              {/* ✅ Redes Sociales con accesibilidad */}
               <div className="mt-8">
                 <h4 className="text-xs uppercase tracking-[0.2em] text-[#DCDCDC]/40 font-semibold mb-4">
                   Conéctate
@@ -476,6 +492,9 @@ export default function Footer() {
                     <motion.a
                       key={social.label}
                       href={social.href}
+                      aria-label={social.ariaLabel}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       whileHover={{ scale: 1.1, y: -3 }}
                       className="w-10 h-10 rounded-full border border-[#D4AF37]/20 flex items-center justify-center text-[#DCDCDC]/60 hover:text-[#D4AF37] hover:border-[#D4AF37] transition-all duration-300"
                     >
@@ -509,14 +528,12 @@ export default function Footer() {
 
                 <StepIndicator />
 
-                {/* Mensaje de error general */}
                 {errors.submit && (
                   <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
                     {errors.submit}
                   </div>
                 )}
 
-                {/* Formulario */}
                 <div ref={formRef} className="step-content">
                   {!isSubmitted ? (
                     <>
@@ -771,7 +788,6 @@ export default function Footer() {
                       </div>
                     </>
                   ) : (
-                    /* Mensaje de éxito */
                     <div ref={successRef}>
                       <div className="text-center py-8">
                         <motion.div
@@ -804,7 +820,6 @@ export default function Footer() {
                             setCurrentStep(1)
                             setErrors({})
                             setTouchedFields(new Set())
-                            // ✅ Restaurar visibilidad del formulario
                             if (formRef.current) {
                               gsap.to(formRef.current, {
                                 opacity: 1,
@@ -850,7 +865,7 @@ export default function Footer() {
         </div>
       </footer>
 
-      {/* ✅ Toast Notification */}
+      {/* Toast Notification */}
       {toast.show && (
         <ToastNotification
           message={toast.message}

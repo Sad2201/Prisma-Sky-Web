@@ -92,12 +92,12 @@ export default function Home() {
 
   return (
     <div ref={mainRef} className="min-h-screen bg-[#050505] relative">
-      {/* ✅ Prisma Background - Siempre visible */}
+      {/* Prisma Background - Siempre visible */}
       <Suspense fallback={null}>
         <PrismaBackground />
       </Suspense>
 
-      {/* ✅ Hero Canvas - Encima del prisma */}
+      {/* Hero Canvas - Encima del prisma */}
       <Suspense fallback={null}>
         <div className="fixed inset-0 -z-5 pointer-events-none">
           <HeroCanvas />

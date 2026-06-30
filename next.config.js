@@ -17,7 +17,6 @@ const nextConfig = {
     optimizeCss: true,
     scrollRestoration: true,
   },
-  // ✅ Agregar turbopack.root para silenciar el warning
   turbopack: {
     root: process.cwd(),
     resolveAlias: {
