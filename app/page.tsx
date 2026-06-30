@@ -1,21 +1,41 @@
-// app/page.tsx - OPTIMIZADO
+// app/page.tsx - VERSIÓN COMPLETA
 'use client'
 
-import { useEffect, useRef, Suspense, lazy } from 'react'
+import { useEffect, useRef } from 'react'
 import { motion, useScroll, useSpring } from 'framer-motion'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import dynamic from 'next/dynamic'
 
-// ✅ Lazy loading con Suspense
-const HeroCanvas = lazy(() => import('@/components/HeroCanvas'))
-const PrismaBackground = lazy(() => import('@/components/PrismaBackground'))
-const Header = lazy(() => import('@/components/Header'))
-const HeroSection = lazy(() => import('@/components/HeroSection'))
-const BentoGrid = lazy(() => import('@/components/BentoGrid'))
-const Methodology = lazy(() => import('@/components/Methodology'))
-const AboutCompany = lazy(() => import('@/components/AboutCompany'))
-const TechDocs = lazy(() => import('@/components/TechDocs'))
-const Footer = lazy(() => import('@/components/Footer'))
+// ✅ Importación dinámica del Canvas Hero
+const HeroCanvas = dynamic(
+  () => import('@/components/HeroCanvas'),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="absolute inset-0 bg-[#050505]">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#D4AF37]/5 to-transparent animate-pulse" />
+      </div>
+    )
+  }
+)
+
+// ✅ Importación del Prisma Background
+const PrismaBackground = dynamic(
+  () => import('@/components/PrismaBackground'),
+  { 
+    ssr: false,
+    loading: () => null
+  }
+)
+
+import Header from '@/components/Header'
+import HeroSection from '@/components/HeroSection'
+import BentoGrid from '@/components/BentoGrid'
+import Methodology from '@/components/Methodology'
+import AboutCompany from '@/components/AboutCompany'
+import TechDocs from '@/components/TechDocs'
+import Footer from '@/components/Footer'
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger)
@@ -40,7 +60,11 @@ export default function Home() {
       
       sections.forEach((section) => {
         gsap.fromTo(section,
-          { opacity: 0.4, y: 40, scale: 0.97 },
+          { 
+            opacity: 0.4,
+            y: 40,
+            scale: 0.97
+          },
           {
             opacity: 1,
             y: 0,
@@ -94,69 +118,51 @@ export default function Home() {
 
   return (
     <div ref={mainRef} className="min-h-screen bg-[#050505] relative">
-      {/* ✅ Prisma Background - Carga diferida */}
-      <Suspense fallback={null}>
-        <PrismaBackground />
-      </Suspense>
+      {/* ✅ PRISMA BACKGROUND - VISIBLE Y FUNCIONAL */}
+      <PrismaBackground />
 
-      {/* ✅ Canvas Hero - Carga diferida */}
-      <Suspense fallback={null}>
-        <div className="fixed inset-0 -z-10">
-          <HeroCanvas />
-        </div>
-      </Suspense>
+      {/* ✅ Canvas Hero - Encima del prisma */}
+      <div className="fixed inset-0 -z-5">
+        <HeroCanvas />
+      </div>
 
       {/* Progress Bar */}
       <div className="fixed top-0 left-0 right-0 h-[2px] bg-[#D4AF37]/10 z-50">
         <div className="progress-bar-fill h-full bg-gradient-to-r from-[#D4AF37] to-[#AA7C11] w-0" />
       </div>
 
-      {/* Overlay */}
-      <div className="fixed inset-0 pointer-events-none z-0">
+      {/* Overlay Gradient */}
+      <div className="fixed inset-0 pointer-events-none z-5">
         <div className="absolute inset-0 bg-gradient-to-b from-[#050505]/0 via-[#050505]/20 to-[#050505]/60" />
       </div>
 
       {/* Contenido */}
       <div className="relative z-10">
-        <Suspense fallback={<div className="h-16" />}>
-          <Header />
-        </Suspense>
+        <Header />
         
         <main>
           <div className="section-reveal" id="inicio">
-            <Suspense fallback={<div className="min-h-screen" />}>
-              <HeroSection />
-            </Suspense>
+            <HeroSection />
           </div>
 
           <div className="section-reveal" id="servicios">
-            <Suspense fallback={<div className="min-h-[400px]" />}>
-              <BentoGrid />
-            </Suspense>
+            <BentoGrid />
           </div>
 
           <div className="section-reveal" id="metodologia">
-            <Suspense fallback={<div className="min-h-[400px]" />}>
-              <Methodology />
-            </Suspense>
+            <Methodology />
           </div>
 
           <div className="section-reveal" id="empresa">
-            <Suspense fallback={<div className="min-h-[400px]" />}>
-              <AboutCompany />
-            </Suspense>
+            <AboutCompany />
           </div>
 
           <div className="section-reveal" id="documentacion">
-            <Suspense fallback={<div className="min-h-[400px]" />}>
-              <TechDocs />
-            </Suspense>
+            <TechDocs />
           </div>
 
           <div className="section-reveal" id="postular">
-            <Suspense fallback={<div className="min-h-[400px]" />}>
-              <Footer />
-            </Suspense>
+            <Footer />
           </div>
         </main>
       </div>
